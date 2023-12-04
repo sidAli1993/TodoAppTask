@@ -135,4 +135,8 @@ dependencies {
     kapt ("androidx.room:room-compiler:2.6.1")
     implementation ("com.guolindev.permissionx:permissionx:1.7.1")
 
+
+    implementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.compose.runtime:runtime-livedata")
+
 }
