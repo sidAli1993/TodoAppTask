@@ -6,6 +6,7 @@ import com.sid_ali_tech.todoapptask.data.repository.TodosRepositoryImpl
 import com.google.gson.GsonBuilder
 import com.sid_ali_tech.todoapptask.data.local.AppDatabase
 import com.sid_ali_tech.todoapptask.data.remote.ApiService
+import com.sid_ali_tech.todoapptask.datastore.PreferenceDataStoreHelper
 import com.sid_ali_tech.todoapptask.domain.repository.TodosRepository
 import dagger.Module
 import dagger.Provides
@@ -62,8 +63,13 @@ object HiltModule {
     }
 
     @Provides
-    fun providesGetTodosRepository(apiService: ApiService,appDatabase: AppDatabase): TodosRepository {
-        return TodosRepositoryImpl(apiService,appDatabase)
+    fun providesDataStore(@ApplicationContext context: Context): PreferenceDataStoreHelper {
+        return PreferenceDataStoreHelper(context)
+    }
+
+    @Provides
+    fun providesGetTodosRepository(apiService: ApiService,appDatabase: AppDatabase,preferenceDataStoreHelper: PreferenceDataStoreHelper): TodosRepository {
+        return TodosRepositoryImpl(apiService,appDatabase,preferenceDataStoreHelper)
     }
 
 }

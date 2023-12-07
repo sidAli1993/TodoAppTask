@@ -134,7 +134,8 @@ dependencies {
     annotationProcessor ("androidx.room:room-compiler:2.6.1")
     kapt ("androidx.room:room-compiler:2.6.1")
     implementation ("com.guolindev.permissionx:permissionx:1.7.1")
-
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
     implementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.runtime:runtime-livedata")

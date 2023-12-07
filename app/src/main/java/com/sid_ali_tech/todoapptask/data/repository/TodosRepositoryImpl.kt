@@ -1,12 +1,15 @@
 package com.sid_ali_tech.todoapptask.data.repository
 
 import android.util.Log
+import com.google.gson.Gson
 import com.sid_ali_tech.todoapptask.common.Constants.AppCycle
 import com.sid_ali_tech.todoapptask.common.Constants.TAG
 import com.sid_ali_tech.todoapptask.common.Response
 import com.sid_ali_tech.todoapptask.data.local.AppDatabase
 import com.sid_ali_tech.todoapptask.domain.model.Todo
 import com.sid_ali_tech.todoapptask.data.remote.ApiService
+import com.sid_ali_tech.todoapptask.datastore.PreferenceDataStoreConstants.TODOS_LIST
+import com.sid_ali_tech.todoapptask.datastore.PreferenceDataStoreHelper
 import com.sid_ali_tech.todoapptask.domain.model.RemoteTasks
 import com.sid_ali_tech.todoapptask.domain.repository.TodosRepository
 import kotlinx.coroutines.channels.awaitClose
@@ -16,15 +19,19 @@ import kotlinx.coroutines.flow.channelFlow
 import java.lang.Exception
 import javax.inject.Inject
 
-class TodosRepositoryImpl @Inject constructor(private val apiService: ApiService,private val appDatabase: AppDatabase): TodosRepository {
+class TodosRepositoryImpl @Inject constructor(private val apiService: ApiService,
+                                              private val appDatabase: AppDatabase
+,private val preferenceDataStoreHelper: PreferenceDataStoreHelper): TodosRepository {
     override fun getTodos(): Flow<Response<RemoteTasks>> = channelFlow{
         try {
             trySend(Response.Loading)
             if (AppCycle){
                 val resp = apiService.getTodos()
+                preferenceDataStoreHelper.putPreference(TODOS_LIST,Gson().toJson(resp))
                 resp.todos.forEach {
                     appDatabase.taskDao()?.saveData(it)
                 }
+
                 delay(1000)
                 AppCycle=false
             }

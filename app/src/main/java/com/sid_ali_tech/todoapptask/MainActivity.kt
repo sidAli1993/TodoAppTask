@@ -9,6 +9,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sid_ali_tech.todoapptask.presentation.navigations.Navigation
 import com.sid_ali_tech.todoapptask.presentation.screens.addedittask.AddEditTaskViewModel
@@ -32,14 +34,24 @@ import com.sid_ali_tech.todoapptask.presentation.screens.home.HomeViewModel
 import com.sid_ali_tech.todoapptask.ui.theme.TodoListAppTheme
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.gson.Gson
 import com.permissionx.guolindev.PermissionX
 import com.sid_ali_tech.todoapptask.common.Constants
+import com.sid_ali_tech.todoapptask.common.Constants.TAG
+import com.sid_ali_tech.todoapptask.datastore.PreferenceDataStoreConstants
+import com.sid_ali_tech.todoapptask.datastore.PreferenceDataStoreHelper
+import com.sid_ali_tech.todoapptask.domain.model.RemoteTasks
 import com.sid_ali_tech.todoapptask.ui.theme.MainBackground
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
+    
+    @Inject 
+    lateinit var preferenceDataStoreHelper: PreferenceDataStoreHelper
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -88,5 +100,16 @@ class MainActivity : ComponentActivity() {
             }
 
         }
+        lifecycleScope.launch {
+            preferenceDataStoreHelper.getPreference(PreferenceDataStoreConstants.TODOS_LIST, "")
+                .collect() {
+                    if (it.isNotEmpty()) {
+                        val todos=Gson().fromJson<RemoteTasks>(it,RemoteTasks::class.java)
+//                        todos u get here
+                        Toast.makeText(this@MainActivity, "U have get the data in data store by using flow", Toast.LENGTH_LONG).show()
+                    }
+                }
+        }
+       
     }
 }
